@@ -1,0 +1,105 @@
+:root {
+    --bg-dark: #222222;
+    --bg-game: #353535;
+}
+
+body {
+    background-color: var(--bg-dark);
+}
+
+main {
+    width: 100%;
+    position: relative;
+    padding: 1em;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.gameArea {
+    height: 50%;
+    aspect-ratio: 1;
+    background: var(--bg-game);
+    border-radius: 2px;
+    border: 1px solid #555;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+}
+
+.board {
+    position: absolute;
+    aspect-ratio: 10 / 20;
+    height: 100%;
+    background: var(--bg-game);
+    display: grid;
+}
+
+.sideinfo {
+    position: absolute;
+    aspect-ratio: 10 / 20;
+    height: 100%;
+    right: 0;
+    background: var(--bg-game);
+    border: 1px solid white;
+}
+
+.row {
+    display: grid;
+    width: 100%;
+    margin: 0;
+    grid-template-columns: repeat(10, 0.1fr);
+}
+
+.cell {
+    grid-row: 1;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border: 1px solid white;
+}
+
+.sendLines {
+    width: 10%;
+    height: 100%;
+    float: left;
+    border-right: 2px solid white;
+}
+
+.sendLines::before {
+    position: absolute;
+    content: "";
+    width: calc(10% - 2px);
+    height: 40%;
+    bottom: 0;
+    background: red;
+}
+
+.otherInfo {
+    float: left;
+    width: 90%;
+    height: 100%;
+    background: blue;
+    text-align: center;
+}
+
+.otherInfo .infoSection {
+    border-bottom: 2px solid white;
+}
+
+#heldPiece {
+    position: relative;
+    width: 50%;
+    left: 25%;
+    aspect-ratio: 1;
+    margin-bottom: 32px;
+}
+
+#heldPiece .row {
+    grid-template-columns: repeat(4, 0.25fr);
+}
+
+#heldPiece .cell {
+    aspect-ratio: 1;
+}
