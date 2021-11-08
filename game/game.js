@@ -1,66 +1,228 @@
 const {workerData, parentPort} = require('worker_threads');
 var players = [];
 
+const pieces = [
+    [
+        {
+            x: 5,
+            y: 0,
+            colour: '#a000f1'
+        },
+        {
+            x: 4,
+            y: 1,
+            colour: '#a000f1'
+        },
+        {
+            x: 5,
+            y: 1,
+            colour: '#a000f1'
+        },
+        {
+            x: 6,
+            y: 1,
+            colour: '#a000f1'
+        },
+    ],
+    [
+        {
+            x: 3,
+            y: 0,
+            colour: '#01f0f1'
+        },
+        {
+            x: 4,
+            y: 0,
+            colour: '#01f0f1'
+        },
+        {
+            x: 5,
+            y: 0,
+            colour: '#01f0f1'
+        },
+        {
+            x: 6,
+            y: 0,
+            colour: '#01f0f1'
+        },
+    ],
+    [
+        {
+            x: 3,
+            y: 0,
+            colour: '#0101f0'
+        },
+        {
+            x: 3,
+            y: 1,
+            colour: '#0101f0'
+        },
+        {
+            x: 4,
+            y: 1,
+            colour: '#0101f0'
+        },
+        {
+            x: 5,
+            y: 1,
+            colour: '#0101f0'
+        },
+    ],
+    [
+        {
+            x: 5,
+            y: 0,
+            colour: '#0101f0'
+        },
+        {
+            x: 3,
+            y: 1,
+            colour: '#0101f0'
+        },
+        {
+            x: 4,
+            y: 1,
+            colour: '#0101f0'
+        },
+        {
+            x: 5,
+            y: 1,
+            colour: '#0101f0'
+        },
+    ],
+    [
+        {
+            x: 4,
+            y: 0,
+            colour: '#f0f001'
+        },
+        {
+            x: 5,
+            y: 0,
+            colour: '#f0f001'
+        },
+        {
+            x: 4,
+            y: 1,
+            colour: '#f0f001'
+        },
+        {
+            x: 5,
+            y: 1,
+            colour: '#f0f001'
+        },
+    ],
+    [
+        {
+            x: 4,
+            y: 0,
+            colour: '#02ef00'
+        },
+        {
+            x: 5,
+            y: 0,
+            colour: '#02ef00'
+        },
+        {
+            x: 3,
+            y: 1,
+            colour: '#02ef00'
+        },
+        {
+            x: 4,
+            y: 1,
+            colour: '#02ef00'
+        },
+    ],
+    [
+        {
+            x: 3,
+            y: 0,
+            colour: '#f00100'
+        },
+        {
+            x: 4,
+            y: 0,
+            colour: '#f00100'
+        },
+        {
+            x: 4,
+            y: 1,
+            colour: '#f00100'
+        },
+        {
+            x: 5,
+            y: 1,
+            colour: '#f00100'
+        },
+    ],
+];
+
 for (let i = 0; i < workerData.players.length; i++) { 
     let index = players.push({
         id: workerData.players[i].socket,
         session: workerData.players[i].session,
         grid: Array.from(Array(10), () => new Array(20)),
-        movingPieces: Array.from(Array(10), () => new Array(20))
+        movingPieces: [],
+        dead: false
     }) - 1;
-    players[index].movingPieces[5][19] = '#FFF';
+    newPiece(index);
+    parentPort.postMessage({
+        type: 'socketSend',
+        emitChannel: 'updateBoard',
+        socketID: players[index].id,
+        grid: players[index].grid,
+        moving: players[index].movingPieces
+    });
 }
 
 function newPiece(player) {
-    players[player].movingPieces = Array.from(Array(10), () => new Array(20));
-    players[player].movingPieces[5][19] = '#FFF';
+    players[player].movingPieces = JSON.parse(JSON.stringify(pieces[Math.floor(Math.random() * pieces.length)]));
+    players[player].movingPieces.forEach(piece => {
+        if (players[player].grid[piece.x][piece.y] != undefined) {
+            players[player].movingPieces = [];
+            player.dead = true;
+        }
+    });
 }
 
 function moveDown(player) {
+    let grid = players[player].grid;
     let movingPieces = players[player].movingPieces;
     let blocked = false;
-    for (let x = 0; x < movingPieces.length; x++) {
-        let col = movingPieces[x];
-        for (let y = 0; y < col.length; y++) {
-            console.log(x, y, movingPieces[x][y])
-            if (!(movingPieces[x][y] && (!movingPieces[x][y - 1] || y == 19))) {
-                blocked = true;
-            }
+    movingPieces.forEach(piece => {
+        if (grid[piece.x][piece.y + 1] != undefined || piece.y + 1 == 20) {
+            blocked = true;
         }
-    }
+    });
+
     if (blocked) {
+        movingPieces.forEach(piece => {
+            grid[piece.x][piece.y] = piece.colour;
+        });
         newPiece(player);
     } else {
-        console.log(1);
-        for (let x = 0; x < movingPieces.length; x++) {
-            let col = movingPieces[x];
-            for (let y = 0; y < col.length; y++) {
-                if (movingPieces[x][y] && (!movingPieces[x][y - 1] || y == 19)) {
-                    movingPieces[y - 1][x] = movingPieces[y][x];
-                    movingPieces[y][x] = undefined;
-                    players[player].grid[y - 1][x] = players[player].grid[y][x];
-                    players[player].grid[y][x] = undefined;
-                    console.log(players[player].grid[y - 1][x]);
-                }
-            }
-        }
-        players[player].movingPieces = movingPieces;
+        movingPieces.forEach(piece => {
+            piece.y++;
+        });
     }
 }
 
 var gameLoop = setInterval(() => {
     for (let i = 0; i < players.length; i++) {
+        if (players[i].dead) continue;
         moveDown(i);
         grid = players[i].grid;
-        // grid[Math.floor(Math.random() * 10)][Math.floor(Math.random() * 20)] = '#FFFFFF'
+        moving = players[i].movingPieces;
         parentPort.postMessage({
             type: 'socketSend',
             emitChannel: 'updateBoard',
             socketID: players[i].id,
-            msg: grid
+            grid,
+            moving
         });
     }
-}, 1000 / 5)
+}, 1000 / 10)
 
 parentPort.on('message', (data) => {
     if (data.type == 'disconnect') {

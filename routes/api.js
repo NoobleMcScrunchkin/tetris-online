@@ -84,7 +84,7 @@ apiRouter.post('/startGame', async (req, res) => {
 
         games[gameIndex].gameWorker.on('message', async (data) => {
             if (data.type == 'socketSend') {
-                io.to(data.socketID).emit(data.emitChannel, data.msg)
+                io.to(data.socketID).emit(data.emitChannel, {grid: data.grid, moving: data.moving})
             }
 
             if (data.type == 'noPlayers') {

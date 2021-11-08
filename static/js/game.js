@@ -5,6 +5,7 @@ socket.emit('login');
 var currentGame;
 
 let grid = Array.from(Array(10), () => new Array(20));
+let movingPieces = [];
 let gameSpeed = 1000 / 30;
 
 window.onload = () => {
@@ -14,10 +15,19 @@ window.onload = () => {
 function drawGrid() {
     let board = document.getElementsByClassName('board')[0];
     rows = board.children;
-    for (let i = 0; i < rows.length; i++) {
-        let row = rows[i].children;
-        for (let j = 0; j < row.length; j++) {
-            row[j].style.backgroundColor = grid[j][19 - i];
+    for (let y = 0; y < rows.length; y++) {
+        let row = rows[y].children;
+        for (let x = 0; x < row.length; x++) {
+            row[x].style.boxShadow = '';
+            row[x].style.backgroundColor = grid[x][y];
+            if (grid[x][y]) {
+                row[x].style.boxShadow = '0 0 0.1vw 0.5vw rgb(0 0 0 / 50%) inset';
+            }
+            let movingCell = movingPieces.filter(e => e.x === x && e.y == y)[0];
+            if (movingCell) {
+                row[x].style.backgroundColor = movingCell.colour;
+                row[x].style.boxShadow = '0 0 0.1vw 0.5vw rgb(0 0 0 / 50%) inset';
+            }
         }
     }
 }
@@ -28,8 +38,8 @@ let gameLoop = setInterval(() => {
 
 
 socket.on('updateBoard', (data) => {
-    grid = data;
-    console.log(grid);
+    grid = data.grid;
+    movingPieces = data.moving;
 });
 
 
