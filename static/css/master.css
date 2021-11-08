@@ -1,6 +1,7 @@
 :root {
     --bg-dark: #222222;
     --bg-game: #353535;
+    --bg-sendLines: red;
 }
 
 body {
@@ -18,7 +19,7 @@ main {
 }
 
 .gameArea {
-    height: 50%;
+    width: 50%;
     aspect-ratio: 1;
     background: var(--bg-game);
     border-radius: 2px;
@@ -73,14 +74,14 @@ main {
     width: calc(10% - 2px);
     height: 40%;
     bottom: 0;
-    background: red;
+    background: var(--bg-sendLines);
 }
 
 .otherInfo {
     float: left;
     width: 90%;
     height: 100%;
-    background: blue;
+    background: var(--bg-game);
     text-align: center;
 }
 
