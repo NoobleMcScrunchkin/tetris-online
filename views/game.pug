@@ -23,6 +23,10 @@ block main
                 .nextPiece.infoSection
                     h1 Next Piece
                     #nextPiece
+                        each i in Array.from(Array(4).keys())
+                            .row 
+                                each i in Array.from(Array(4).keys())
+                                    .cell
                 .score.infoSection
                     h1 Score
                     span.score 00000000

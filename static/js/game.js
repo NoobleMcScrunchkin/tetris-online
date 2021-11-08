@@ -29,6 +29,7 @@ let gameLoop = setInterval(() => {
 
 socket.on('updateBoard', (data) => {
     grid = data;
+    console.log(grid);
 });
 
 

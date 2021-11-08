@@ -6,10 +6,12 @@
 
 body {
     background-color: var(--bg-dark);
+    height: 100vh;
 }
 
 main {
     width: 100%;
+    height: 90%;
     position: relative;
     padding: 1em;
     color: white;
@@ -19,7 +21,8 @@ main {
 }
 
 .gameArea {
-    width: 50%;
+    width: 75%;
+    max-height: 100%;
     aspect-ratio: 1;
     background: var(--bg-game);
     border-radius: 2px;
@@ -27,6 +30,10 @@ main {
     position: relative;
     display: flex;
     flex-direction: row;
+}
+
+.gameArea h1 {
+    font-size: 4vw
 }
 
 .board {
@@ -85,6 +92,10 @@ main {
     text-align: center;
 }
 
+.score {
+    font-size: 4vw;
+}
+
 .otherInfo .infoSection {
     border-bottom: 2px solid white;
 }
@@ -94,7 +105,7 @@ main {
     width: 50%;
     left: 25%;
     aspect-ratio: 1;
-    margin-bottom: 32px;
+    margin-bottom: 1vh;
 }
 
 #heldPiece .row {
@@ -102,5 +113,21 @@ main {
 }
 
 #heldPiece .cell {
+    aspect-ratio: 1;
+}
+
+#nextPiece {
+    position: relative;
+    width: 50%;
+    left: 25%;
+    aspect-ratio: 1;
+    margin-bottom: 1vh;
+}
+
+#nextPiece .row {
+    grid-template-columns: repeat(4, 0.25fr);
+}
+
+#nextPiece .cell {
     aspect-ratio: 1;
 }
