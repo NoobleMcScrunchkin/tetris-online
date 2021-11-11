@@ -116,3 +116,28 @@ function joinGame(gameID) {
         console.log(data);
     });
 }
+
+window.addEventListener('keydown', (e) => {
+    switch (e.which) {
+        case 90:
+            socket.emit('rotate', {dir: 0});
+            break;
+        case 38:
+        case 88:
+            socket.emit('rotate', {dir: 1});
+            break;
+        case 37:
+            socket.emit('move', {dir: 0});
+            break;
+        case 39:
+            socket.emit('move', {dir: 1});
+            break;
+        case 40:
+            socket.emit('down');
+            break;
+        case 32:
+            socket.emit('harddown');
+        default:
+            break;
+    }
+})

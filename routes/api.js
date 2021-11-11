@@ -148,10 +148,42 @@ function start(newio) {
         socket.on("message", (msg) => {
             console.log(socket.id, socket.handshake.sessionID, msg);
         })
+
+        socket.on("rotate", (data) => {
+            games.forEach(async (game) => {
+                if (game.players.map(e => e.socket).indexOf(socket.id) != -1) {
+                    game.gameWorker.postMessage({type: 'rotate', dir: data.dir, socket: socket.id});
+                }
+            });
+        })
+
+        socket.on("move", (data) => {
+            games.forEach(async (game) => {
+                if (game.players.map(e => e.socket).indexOf(socket.id) != -1) {
+                    game.gameWorker.postMessage({type: 'move', dir: data.dir, socket: socket.id});
+                }
+            });
+        })
+
+        socket.on("down", (data) => {
+            games.forEach(async (game) => {
+                if (game.players.map(e => e.socket).indexOf(socket.id) != -1) {
+                    game.gameWorker.postMessage({type: 'down', socket: socket.id});
+                }
+            });
+        })
+
+        socket.on("harddown", (data) => {
+            games.forEach(async (game) => {
+                if (game.players.map(e => e.socket).indexOf(socket.id) != -1) {
+                    game.gameWorker.postMessage({type: 'harddown', socket: socket.id});
+                }
+            });
+        })
     
         socket.on('disconnect', async () => {
             games.forEach(async (game) => {
-                if (game.players.map(e => e.socket).indexOf(socket.id)) {
+                if (game.players.map(e => e.socket).indexOf(socket.id) != -1) {
                     game.gameWorker.postMessage({type: 'disconnect', socketID: socket.id});
                 }
             });
