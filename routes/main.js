@@ -17,9 +17,9 @@ mainRouter.get('/', (req, res) => {
     });
 });
 
-mainRouter.get('/game', (req, res) => {
-    res.render('game', {
-        currentPage: "/game"
+mainRouter.get('/vs', (req, res) => {
+    res.render('multigame', {
+        currentPage: "/vs"
     }, (error, html) => {
         if (error) {
             console.warn(error);

@@ -1,7 +1,7 @@
 extends components/template.pug
 
 block head 
-    script(src="/js/game.js") 
+    script(src="/js/multi.js") 
 
 block main 
     .gameArea 
@@ -27,6 +27,7 @@ block main
                             .row 
                                 each i in Array.from(Array(4).keys())
                                     .cell
-                .score.infoSection
-                    h1 Score
-                    span.score 00000000
+    #otherPlayers(hidden)
+    br
+    button(onclick="newGameLobby()") New Game Lobby 
+    button(onclick="startGame()") Start Game

@@ -1,5 +1,6 @@
 const {workerData, parentPort} = require('worker_threads');
 var players = [];
+var startingPlayers = [];
 
 const pieces = [
     [
@@ -242,11 +243,17 @@ const pieces = [
 ];
 
 for (let i = 0; i < workerData.players.length; i++) { 
+    let nextID = Math.floor(Math.random() * pieces.length);
     let index = players.push({
         id: workerData.players[i].socket,
-        session: workerData.players[i].session,
         grid: Array.from(Array(10), () => new Array(20)),
         movingPieces: [],
+        movingID: 0,
+        heldID: 0,
+        nextPiece: JSON.parse(JSON.stringify(pieces[nextID])),
+        nextID,
+        heldPiece: [],
+        justHeld: false,
         dead: false
     }) - 1;
     newPiece(index);
@@ -255,9 +262,13 @@ for (let i = 0; i < workerData.players.length; i++) {
         emitChannel: 'updateBoard',
         socketID: players[index].id,
         grid: players[index].grid,
-        moving: players[index].movingPieces
+        moving: players[index].movingPieces,
+        next: players[index].nextPiece,
+        held: players[index].heldPiece
     });
 }
+
+startingPlayers = JSON.parse(JSON.stringify(players));
 
 function rotate(cx, cy, x, y, angle) {
     var radians = (Math.PI / 180) * angle,
@@ -269,17 +280,23 @@ function rotate(cx, cy, x, y, angle) {
 }
 
 function newPiece(player) {
-    players[player].movingPieces = JSON.parse(JSON.stringify(pieces[Math.floor(Math.random() * pieces.length)]));
+    players[player].movingPieces = JSON.parse(JSON.stringify(players[player].nextPiece));
+    players[player].movingID = players[player].nextID
+    players[player].nextID = Math.floor(Math.random() * pieces.length);
+    players[player].nextPiece = JSON.parse(JSON.stringify(pieces[players[player].nextID]));
     // players[player].movingPieces = JSON.parse(JSON.stringify(pieces[6]));
     players[player].movingPieces.forEach(piece => {
         if (players[player].grid[piece.x][piece.y] != undefined) {
             players[player].movingPieces = [];
-            player.dead = true;
+            players[player].dead = true;
         }
     });
 }
 
 function moveDown(player) {
+    if (!players[player]) {
+        return;
+    }
     let grid = players[player].grid;
     let movingPieces = players[player].movingPieces;
     let blocked = false;
@@ -293,6 +310,23 @@ function moveDown(player) {
         movingPieces.forEach(piece => {
             grid[piece.x][piece.y] = piece.colour;
         });
+        for (let y = 19; y > 0; y--) {
+            let complete = true;
+            for (let x = 0; x < grid.length; x++) {
+                if (grid[x][y] == undefined) {
+                    complete = false;
+                }
+            }
+            if (complete) {
+                for (let y2 = y; y2 > 1; y2--) {
+                    for (let x = 0; x < grid.length; x++) {
+                        grid[x][y2] = grid[x][y2 - 1];
+                    }
+                }
+                y++;
+            }
+        }
+        players[player].justHeld = false;
         newPiece(player);
         return 1;
     } else {
@@ -306,18 +340,37 @@ function moveDown(player) {
 
 var gameLoop = setInterval(() => {
     for (let i = 0; i < players.length; i++) {
+        if (!players[i]) {
+            continue;
+        }
         if (players[i].dead) {
             delete players[i];
-        };
-        moveDown(i);
-        grid = players[i].grid;
-        moving = players[i].movingPieces;
+            continue;
+        } else {
+            moveDown(i);
+            grid = players[i].grid;
+            moving = players[i].movingPieces;
+            next = players[i].nextPiece;
+            held = players[i].heldPiece;
+            parentPort.postMessage({
+                type: 'socketSend',
+                emitChannel: 'updateBoard',
+                socketID: players[i].id,
+                grid,
+                moving,
+                next,
+                held
+            });
+        }
+    }
+    for (let i = 0; i < startingPlayers.length; i++) {
+        let otherPlayers = JSON.parse(JSON.stringify(players));
+        otherPlayers.splice(i, 1);
         parentPort.postMessage({
             type: 'socketSend',
-            emitChannel: 'updateBoard',
-            socketID: players[i].id,
-            grid,
-            moving
+            emitChannel: 'updateOtherBoards',
+            socketID: startingPlayers[i].id,
+            otherPlayers
         });
     }
 }, 1000 / 5)
@@ -328,6 +381,9 @@ parentPort.on('message', (data) => {
     if (data.socket) {
         playerI = players.map(e => e.id).indexOf(data.socket);
         player = players[playerI];
+        if (!player || player.dead) {
+            return;
+        }
     }
     if (data.type == 'disconnect') {
         players = players.filter((obj) => {
@@ -430,12 +486,29 @@ parentPort.on('message', (data) => {
         while (move) {
             move = moveDown(playerI) == 0;
         }
+    } else if (data.type == 'hold' && player.justHeld == false) {
+        if (player.heldPiece.length > 0) {
+            player.movingPieces = JSON.parse(JSON.stringify(player.heldPiece));
+            player.heldPiece = JSON.parse(JSON.stringify(pieces[player.movingID]));
+            let temp = player.heldID;
+            player.heldID = player.movingID;
+            player.movingID = temp;
+        } else {
+            player.heldPiece = JSON.parse(JSON.stringify(pieces[player.movingID]));
+            player.heldID = player.movingID;
+            newPiece(playerI);
+        }
+        player.justHeld = true;
     }
-    parentPort.postMessage({
-        type: 'socketSend',
-        emitChannel: 'updateBoard',
-        socketID: data.socket,
-        grid: player.grid,
-        moving: player.movingPieces
-    });
+    if (player) {
+        parentPort.postMessage({
+            type: 'socketSend',
+            emitChannel: 'updateBoard',
+            socketID: data.socket,
+            grid: player.grid,
+            moving: player.movingPieces,
+            next: player.nextPiece,
+            held: player.heldPiece
+        });
+    }
 });

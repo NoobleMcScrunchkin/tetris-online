@@ -69,7 +69,7 @@ apiRouter.post('/startGame', async (req, res) => {
     const db = client.db(dbname);
 
     let game = await db.collection('games').findOne({gameID});
-    if (game) {   
+    if (game && !game.playing) {   
         const players = game.players;
 
         var gameIndex = games.push({
@@ -84,7 +84,7 @@ apiRouter.post('/startGame', async (req, res) => {
 
         games[gameIndex].gameWorker.on('message', async (data) => {
             if (data.type == 'socketSend') {
-                io.to(data.socketID).emit(data.emitChannel, {grid: data.grid, moving: data.moving})
+                io.to(data.socketID).emit(data.emitChannel, {grid: data.grid, moving: data.moving, next: data.next, held: data.held, otherPlayers: data.otherPlayers})
             }
 
             if (data.type == 'noPlayers') {
@@ -122,7 +122,12 @@ apiRouter.post('/joinGame', async (req, res) => {
             await db.collection('players').updateOne({sessionID: req.session.id}, {$set: {gameID}});
             req.session.gameID = gameID;
             req.session.save();
-            res.json({success: true});
+            let ids = [];
+            game.players.forEach(playerDB => {
+                io.to(playerDB.socket, playerDB.session).emit('newPlayer', {id: player.socket});
+                ids.push(playerDB.socket);
+            })
+            res.json({success: true, otherPlayers: ids});
         }
     } else {
         res.json({error: "Game does not exist or is playing."});
@@ -180,6 +185,14 @@ function start(newio) {
                 }
             });
         })
+
+        socket.on("hold", (data) => {
+            games.forEach(async (game) => {
+                if (game.players.map(e => e.socket).indexOf(socket.id) != -1) {
+                    game.gameWorker.postMessage({type: 'hold', socket: socket.id});
+                }
+            });
+        })
     
         socket.on('disconnect', async () => {
             games.forEach(async (game) => {
@@ -218,6 +231,10 @@ function start(newio) {
             } else {
                 db.collection('games').deleteOne({gameID});
             }
+
+            gamedb.players.forEach(player => {
+                io.to(player.socket).emit('removePlayer', {id: socket.id});
+            })
         })
     });
     return apiRouter;

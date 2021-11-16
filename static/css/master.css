@@ -15,25 +15,43 @@ main {
     position: relative;
     padding: 1em;
     color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    text-align: center;
 }
 
 .gameArea {
-    width: 75%;
-    max-height: 100%;
+    width: 40%;
+    max-height: 95%;
+    display: inline-block;
     aspect-ratio: 1;
     background: var(--bg-game);
     border-radius: 2px;
     border: 1px solid #555;
     position: relative;
-    display: flex;
-    flex-direction: row;
+}
+
+#otherPlayers {
+    width: 50%;
+    max-height: 95%;
+    display: inline-block;
+    aspect-ratio: 5 / 4;
+    background: var(--bg-game);
+    border-radius: 2px;
+    border: 1px solid #555;
+    position: relative;
+    margin-left: 16px;
+    overflow-y: scroll;
+}
+
+.otherPlayer {
+    width: 25%;
+    height: 50%;
+    text-align: left;
+    float: left;
+    padding: 8px;
 }
 
 .gameArea h1 {
-    font-size: 4vw
+    font-size: 2vw;
 }
 
 .board {
@@ -42,6 +60,12 @@ main {
     height: 100%;
     background: var(--bg-game);
     display: grid;
+}
+
+.otherBoard {
+    height: 85%;
+    position: relative;
+    float: left;
 }
 
 .sideinfo {
@@ -82,6 +106,7 @@ main {
     height: 40%;
     bottom: 0;
     background: var(--bg-sendLines);
+    left: 0;
 }
 
 .otherInfo {
@@ -90,10 +115,6 @@ main {
     height: 100%;
     background: var(--bg-game);
     text-align: center;
-}
-
-.score {
-    font-size: 4vw;
 }
 
 .otherInfo .infoSection {
