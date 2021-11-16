@@ -1,7 +1,7 @@
 extends components/template.pug
 
 block head 
-    script(src="/js/multi.js") 
+    script(src="/js/clientgame.js") 
 
 block main 
     .gameArea 
@@ -29,5 +29,5 @@ block main
                                     .cell
     #otherPlayers(hidden)
     br
-    button(onclick="newGameLobby()") New Game Lobby 
+    button(onclick="newGameLobby('vs')") New Game Lobby 
     button(onclick="startGame()") Start Game

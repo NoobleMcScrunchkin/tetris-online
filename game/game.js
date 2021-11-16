@@ -242,6 +242,9 @@ const pieces = [
     ],
 ];
 
+const gameMode = workerData.gameMode;
+const startTime = new Date();
+
 for (let i = 0; i < workerData.players.length; i++) { 
     let nextID = Math.floor(Math.random() * pieces.length);
     let index = players.push({
@@ -254,7 +257,8 @@ for (let i = 0; i < workerData.players.length; i++) {
         nextID,
         heldPiece: [],
         justHeld: false,
-        dead: false
+        dead: false,
+        linesCleared: 0
     }) - 1;
     newPiece(index);
     parentPort.postMessage({
@@ -318,6 +322,7 @@ function moveDown(player) {
                 }
             }
             if (complete) {
+                players[player].linesCleared++;
                 for (let y2 = y; y2 > 1; y2--) {
                     for (let x = 0; x < grid.length; x++) {
                         grid[x][y2] = grid[x][y2 - 1];
@@ -361,6 +366,17 @@ var gameLoop = setInterval(() => {
                 next,
                 held
             });
+            if (gameMode == '40lines' && players[i].linesCleared == 40) {
+                //Submit Score
+                let time = (new Date()) - startTime;
+                console.log(time);
+                parentPort.postMessage({
+                    type: '40linescomplete',
+                    time,
+                    socketID: players[i].id,
+                });
+                clearInterval(gameLoop);
+            }
         }
     }
     for (let i = 0; i < startingPlayers.length; i++) {

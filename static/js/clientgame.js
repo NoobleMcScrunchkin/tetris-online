@@ -150,7 +150,7 @@ socket.on('removePlayer', (data) => {
 });
 
 
-function newGameLobby() {
+function newGameLobby(gameMode) {
     (async function getLobby() {
         const response = await fetch('/api/newGame', {
             method: 'POST',
@@ -163,7 +163,7 @@ function newGameLobby() {
             redirect: 'follow',
             referrerPolicy: 'no-referrer',
             body: JSON.stringify({
-                
+                gamemode: gameMode
             })
         });
 
@@ -191,7 +191,7 @@ function startGame() {
             redirect: 'follow',
             referrerPolicy: 'no-referrer',
             body: JSON.stringify({
-                gameID: currentGame
+                gameID: currentGame,
             })
         });
 
@@ -220,17 +220,21 @@ function joinGame(gameID) {
 
         return response.json();
     })().then((data) => {
-        console.log(data.success);
-        data.otherPlayers.forEach(id => {
-            console.log(id);
-            let grid = Array.from(Array(10), () => new Array(20));
-            let movingPieces = [];
-            otherPlayers.push({
-                id,
-                grid,
-                movingPieces
-            })
-        });
+        if (data.success) {
+            data.otherPlayers.forEach(id => {
+                console.log(id);
+                let grid = Array.from(Array(10), () => new Array(20));
+                let movingPieces = [];
+                otherPlayers.push({
+                    id,
+                    grid,
+                    movingPieces
+                })
+            });
+        }
+        if (data.error) {
+            console.log(data.error);
+        }
         drawOtherGrids();
     });
 }
