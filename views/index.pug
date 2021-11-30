@@ -1,15 +1,34 @@
 extends components/template.pug
 
 block head 
-    script.
-        function onSignIn(googleUser) {
-            var profile = googleUser.getBasicProfile();
-            console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-            console.log('Name: ' + profile.getName());
-            console.log('Image URL: ' + profile.getImageUrl());
-            console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-        }
 
 block main 
-    h1 test
-    .g-signin2(data-onsuccess="onSignIn")
+    section.mt-5
+        h1.large-text Tetris Online
+        a.btn.btn-primary.mt-2.medium-text(href="/login") 
+            strong Get Started 
+
+    include components/transitions/black-blue.pug
+    
+    section.bg-blue.remaining-height
+        h1.large-text Versus
+        div.medium-text.w-50
+            strong.w-50 Create a lobby and compete against others and see who can be the last one to survive the lines sent from your opponents.
+
+    include components/transitions/blue-orange.pug
+
+    section.bg-orange.remaining-height
+        h1.large-text 40 Lines
+        div.medium-text.w-50
+            strong.w-50 Clear lines as fast as you can and see how quickly you can remove 40 lines from the board. Compare against others scores on the Leaderboard!
+
+    include components/transitions/orange-pink.pug
+
+    section.bg-pink.remaining-height
+        h1.large-text Zen
+        div.medium-text.w-50
+            strong.w-50 Chill gamemode where you just play for as long as you can. Can also compare how long you can survive for on the Leaderboard!
+
+    include components/transitions/pink-black.pug
+
+    include components/footer.pug

@@ -1,0 +1,28 @@
+extends components/template.pug
+
+block head 
+
+block main 
+    section
+        .loginFormContainer
+            form(action="/signup" method="POST") 
+                .mb-3
+                    label.form-label(for='loginUsername') Username
+                    input#loginUsername.form-control(type='username' name='username' aria-describedby='usernameHelp')
+                .mb-3
+                    label.form-label(for='loginPassword') Password
+                    input#loginPassword.form-control(type='password' name='password')
+                .mb-3
+                    label.form-label(for='loginPasswordConf') Password Confirmation
+                    input#loginPasswordConf.form-control(type='password' name='passwordConf')
+                if (failure)
+                    .mb-3.formFailure
+                        if (failure == 'invalidUsername')
+                            | Username has been taken
+                        if (failure == 'passwordNoMatch')
+                            | Passwords do not match
+                        if (failure == 'passwordReqFail')
+                            | Password must be at least 8 Characters
+                button.btn.btn-primary(type='submit') Submit
+
+    include components/footer.pug

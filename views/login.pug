@@ -1,0 +1,20 @@
+extends components/template.pug
+
+block head 
+
+block main 
+    section
+        .loginFormContainer
+            form(action="/login" method="POST") 
+                .mb-3
+                    label.form-label(for='loginUsername') Username
+                    input#loginUsername.form-control(type='username' name='username' aria-describedby='usernameHelp')
+                .mb-3
+                    label.form-label(for='loginPassword') Password
+                    input#loginPassword.form-control(type='password' name='password')
+                if (failure)
+                    .mb-3.formFailure
+                        | Username or Password is incorrect
+                button.btn.btn-primary(type='submit') Submit
+    
+    include components/footer.pug

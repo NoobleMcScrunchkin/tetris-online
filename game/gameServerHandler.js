@@ -43,7 +43,9 @@ module.exports.startGame = async function(players, gameID, gameMode) {
             games.splice(gameIndex, 1);
 
             await db.collection('games').deleteOne({gameID});
-            await db.collection('40lines').insertOne({user: data.socketID, time: data.time});
+            if (data.user) {
+                await db.collection('40lines').insertOne({user: data.user, time: data.time});
+            }
         }
     });
 }

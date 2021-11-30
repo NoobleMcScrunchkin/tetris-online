@@ -51,8 +51,11 @@ apiRouter.post('/newGame', async (req, res) => {
                         gameID = makeid(6);
                     }
                 }
-
-                response = await db.collection('games').insertOne({gameID, creator: req.session.id, playing: false, gameMode, players: [{session: req.session.id, socket: player.socket}]});
+                let userid;
+                if (req.session.user) {
+                    userid = await req.session.user._id;
+                }
+                response = await db.collection('games').insertOne({gameID, creator: req.session.id, playing: false, gameMode, players: [{session: req.session.id, socket: player.socket, user: userid}]});
                 await db.collection('players').updateOne({sessionID: req.session.id}, {$set: {gameID}});
                 req.session.gameID = gameID;
                 req.session.save();
@@ -103,7 +106,11 @@ apiRouter.post('/joinGame', async (req, res) => {
         if (game.players.map(e => e.socket).indexOf(player.socket) != -1 || game.players.map(e => e.session).indexOf(req.session.id) != -1) {
             res.json({error: "Already in this game."})
         } else {
-            let response = await db.collection('games').updateOne({gameID}, { $push: { players: { session: req.session.id, socket: player.socket } } })
+            let userid;
+            if (req.session.user) {
+                userid = await req.session.user._id;
+            }
+            let response = await db.collection('games').updateOne({gameID}, { $push: { players: { session: req.session.id, socket: player.socket, user: userid } } })
             await db.collection('players').updateOne({sessionID: req.session.id}, {$set: {gameID}});
             req.session.gameID = gameID;
             req.session.save();

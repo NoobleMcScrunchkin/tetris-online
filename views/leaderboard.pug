@@ -1,0 +1,9 @@
+extends components/template.pug
+
+block head 
+
+block main 
+    section
+        each score in scores
+            h1= score.username 
+            h1= score.time / 1000

@@ -2,6 +2,10 @@
     --bg-dark: #222222;
     --bg-game: #353535;
     --bg-sendLines: red;
+    --bg-login: #353535;
+    --bg-blue: #3474ff;
+    --bg-orange: #fa7233;
+    --bg-pink: #ff00b3;
 }
 
 body {
@@ -13,9 +17,43 @@ main {
     width: 100%;
     height: 90%;
     position: relative;
-    padding: 1em;
+    /* padding: 1em; */
     color: white;
     text-align: center;
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+}
+
+section {
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.remaining-height {
+    flex-grow: 1;
+}
+
+.bg-blue {
+    background-color: var(--bg-blue);
+}
+
+.bg-orange {
+    background-color: var(--bg-orange);
+}
+
+.bg-pink {
+    background-color: var(--bg-pink);
+}
+
+.large-text {
+    font-size: 5vw;
+}
+
+.medium-text {
+    font-size: 2vw;
 }
 
 .gameArea {
@@ -60,6 +98,8 @@ main {
     height: 100%;
     background: var(--bg-game);
     display: grid;
+    border: 1px solid white;
+    border-right: none;
 }
 
 .otherBoard {
@@ -89,7 +129,7 @@ main {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    border: 1px solid white;
+    border: 1px solid #444;
 }
 
 .sendLines {
@@ -151,4 +191,44 @@ main {
 
 #nextPiece .cell {
     aspect-ratio: 1;
+}
+
+.loginFormContainer {
+    width: 100%;
+    height: auto;
+    padding: 1em;
+    margin-top: 20vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.loginFormContainer form {
+    padding: 1em;
+    background: var(--bg-login);
+    width: 40%;
+    border-radius: 8px;
+    border: 1px solid white;
+}
+
+.formFailure {
+    background: rgba(255, 0 , 0, 0.25);
+    padding: 0.25em;
+    border: 1px solid white;
+    border-radius: 8px;
+}
+
+@media only screen and (max-width: 600px) {
+    .loginFormContainer form {
+        width: 90%;
+    }
+}
+
+.dropdown-menu-right {
+    left: auto !important;
+    right: 0 !important;
+}
+
+.img-text-height {
+    height: 2em;
 }

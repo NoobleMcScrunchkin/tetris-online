@@ -47,7 +47,7 @@ io.use(sharedsession(session, { autoSave: true }));
 app.set('view engine', 'pug');
 app.set('views', './views');
 
-// app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
 // app.use(morgan('tiny'));
@@ -56,6 +56,7 @@ app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/
 app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
 app.use('/js', express.static(path.join(__dirname, 'static/js')))
 app.use('/css', express.static(path.join(__dirname, 'static/css')));
+app.use('/img', express.static(path.join(__dirname, 'static/img')));
 
 const mainRouter = require('./routes/main');
 app.use('/', mainRouter);

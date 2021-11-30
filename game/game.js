@@ -249,6 +249,7 @@ for (let i = 0; i < workerData.players.length; i++) {
     let nextID = Math.floor(Math.random() * pieces.length);
     let index = players.push({
         id: workerData.players[i].socket,
+        user: workerData.players[i].user,
         grid: Array.from(Array(10), () => new Array(20)),
         movingPieces: [],
         movingID: 0,
@@ -369,11 +370,11 @@ var gameLoop = setInterval(() => {
             if (gameMode == '40lines' && players[i].linesCleared == 40) {
                 //Submit Score
                 let time = (new Date()) - startTime;
-                console.log(time);
+                // console.log(time);
                 parentPort.postMessage({
                     type: '40linescomplete',
                     time,
-                    socketID: players[i].id,
+                    user: players[i].user,
                 });
                 clearInterval(gameLoop);
             }
