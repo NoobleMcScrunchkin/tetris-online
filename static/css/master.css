@@ -58,11 +58,11 @@ section {
 }
 
 .large-text {
-    font-size: 5vw;
+    font-size: 4em;
 }
 
 .medium-text {
-    font-size: 2vw;
+    font-size: 1.25em;
 }
 
 .gameArea {
@@ -245,7 +245,8 @@ section {
 
 .leaderboardLinks {
     border-bottom: 2px solid grey;
-    width: 25%;
+    padding-left: 16px;
+    padding-right: 16px;
 }
 
 .leaderboardLinks a {
@@ -257,3 +258,13 @@ section {
     color: white;
 }
 
+
+.table {
+    text-align: left;
+    width: 50%;
+    font-size: 1.5em;
+    --bs-table-bg: #2a2a2a;
+    --bs-table-striped-bg: #333;
+    border-radius: 8px;
+    border: 1px solid #444;
+}

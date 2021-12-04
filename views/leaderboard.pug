@@ -3,7 +3,7 @@ extends components/template.pug
 block head 
 
 block main 
-    section
+    section.m-4
         .leaderboardLinks
             if (leaderboard == '40lines')
                 a(href="/leaderboard/40lines") 
@@ -18,6 +18,15 @@ block main
                 a.ms-4(href="/leaderboard/zen") 
                     h2.d-inline Zen
     section
-        each score in scores
-            h1= score.username 
-            h1= score.time / 1000
+        table.table.table-borderless.text-white.table-striped.table-dark
+            thead 
+                th(width="64px")
+                th Username 
+                th Time 
+            tbody             
+                each score in scores
+                    tr
+                        td
+                            img(src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt=score.username width="64px" height="64px")
+                        td= score.username 
+                        td= score.time / 1000

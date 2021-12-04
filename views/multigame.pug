@@ -1,7 +1,8 @@
 extends components/template.pug
 
 block head 
-    script(src="/js/clientgame.js") 
+    if (!mobile)
+        script(src="/js/clientgame.js") 
 
 block main
     div.p-4
@@ -34,5 +35,6 @@ block main
                 br
             else 
                 h1 Sorry, the game is not available on mobile yet.
-        h2#LobbyURL
-        button#startGame.btn.btn-primary(onclick="startGame()") Start Game
+        if (!mobile)
+            h2#LobbyURL
+            button#startGame.btn.btn-primary(onclick="startGame()") Start Game

@@ -206,7 +206,9 @@ mainRouter.get('/leaderboard/:gamemode', async (req, res) => {
     
     const db = client.db(dbname);
 
-    let scoresDB = await db.collection(gamemode).find().toArray();
+    let sort = gamemode == '40lines' ? {time: 1} : {time : -1};
+
+    let scoresDB = await db.collection(gamemode).find().sort(sort).toArray();
 
     var scores = [];
 

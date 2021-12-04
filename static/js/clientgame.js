@@ -190,8 +190,10 @@ function newGameLobby(gameMode) {
             return;
         }
         currentGame = data.gameID;
-        if (gameMode == 'vs')
-        document.getElementById('LobbyURL').textContent = `Lobby Url: ${window.location.origin}/vs?lobby=${currentGame}`
+        if (gameMode == 'vs') {
+            document.getElementById('LobbyURL').textContent = `Lobby Url: ${window.location.origin}/vs?lobby=${currentGame}`
+            window.history.pushState('lobby', 'Tetris', '/vs?lobby=' + currentGame);
+        }
     });
 }
 
