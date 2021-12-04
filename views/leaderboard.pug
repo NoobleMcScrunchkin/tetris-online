@@ -4,6 +4,20 @@ block head
 
 block main 
     section
+        .leaderboardLinks
+            if (leaderboard == '40lines')
+                a(href="/leaderboard/40lines") 
+                    h2.d-inline.active 40 Lines
+            else 
+                a(href="/leaderboard/40lines") 
+                    h2.d-inline 40 Lines
+            if (leaderboard == 'zen')
+                a.ms-4(href="/leaderboard/zen") 
+                    h2.d-inline.active Zen
+            else 
+                a.ms-4(href="/leaderboard/zen") 
+                    h2.d-inline Zen
+    section
         each score in scores
             h1= score.username 
             h1= score.time / 1000

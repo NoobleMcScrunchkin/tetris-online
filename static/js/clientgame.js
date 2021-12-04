@@ -1,7 +1,5 @@
 const socket = io();
 
-socket.emit('login');
-
 var currentGame;
 
 let grid = Array.from(Array(10), () => new Array(20));
@@ -14,6 +12,22 @@ let otherPlayers = [];
 window.onload = () => {
     document.body.style.overflow = "hidden";
 }
+
+socket.on('connect', () => {
+    socket.emit('login');
+});
+
+socket.on('loggedIn', () => {
+    urlParams = new URLSearchParams(window.location.search);
+    lobby = urlParams.get('lobby');
+    var path = window.location.pathname;
+    var page = path.split("/").pop();
+    if (lobby && page == "vs") {
+        joinGame(lobby);
+    } else {
+        newGameLobby(page);
+    }
+})
 
 function drawGrid() {
     let board = document.getElementsByClassName('board')[0];
@@ -166,15 +180,18 @@ function newGameLobby(gameMode) {
                 gamemode: gameMode
             })
         });
-
+        
         return response.json();
     })().then((data) => {
+        console.log(data);
         if (data.error) {
             console.log(data.error);
             // currentGame = undefined;
             return;
         }
         currentGame = data.gameID;
+        if (gameMode == 'vs')
+        document.getElementById('LobbyURL').textContent = `Lobby Url: ${window.location.origin}/vs?lobby=${currentGame}`
     });
 }
 
@@ -231,6 +248,9 @@ function joinGame(gameID) {
                     movingPieces
                 })
             });
+            currentGame = gameID;
+            document.getElementById('LobbyURL').textContent = `Lobby Url: ${window.location.origin}/vs?lobby=${gameID}`
+            document.getElementById('startGame').disabled = true;
         }
         if (data.error) {
             console.log(data.error);
@@ -267,4 +287,4 @@ window.addEventListener('keydown', (e) => {
         default:
             break;
     }
-})
+});

@@ -47,6 +47,16 @@ module.exports.startGame = async function(players, gameID, gameMode) {
                 await db.collection('40lines').insertOne({user: data.user, time: data.time});
             }
         }
+
+        if (data.type == 'zencomplete') {
+            games[gameIndex].gameWorker.terminate();
+            games.splice(gameIndex, 1);
+
+            await db.collection('games').deleteOne({gameID});
+            if (data.user) {
+                await db.collection('zen').insertOne({user: data.user, time: data.time});
+            }
+        }
     });
 }
 
@@ -63,6 +73,7 @@ module.exports.init = function(newio) {
             const db = client.db(dbname);
 
             db.collection('players').updateOne({sessionID: socket.handshake.session.id}, {$set: {socket: socket.id}}, {upsert: true});
+            socket.emit('loggedIn');         
         })
         
 

@@ -149,6 +149,37 @@ mainRouter.get('/vs', (req, res) => {
     res.render('multigame', {
         currentPage: "/vs",
         user: req.session.user,
+        mobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(req.headers["user-agent"]),
+    }, (error, html) => {
+        if (error) {
+            console.warn(error);
+            res.end();
+            return;
+        }
+        res.send(html);
+    });
+});
+
+mainRouter.get('/40lines', (req, res) => {
+    res.render('multigame', {
+        currentPage: "/40lines",
+        user: req.session.user,
+        mobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(req.headers["user-agent"]),
+    }, (error, html) => {
+        if (error) {
+            console.warn(error);
+            res.end();
+            return;
+        }
+        res.send(html);
+    });
+});
+
+mainRouter.get('/zen', (req, res) => {
+    res.render('multigame', {
+        currentPage: "/zen",
+        user: req.session.user,
+        mobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(req.headers["user-agent"]),
     }, (error, html) => {
         if (error) {
             console.warn(error);
@@ -165,7 +196,7 @@ mainRouter.get('/leaderboard', async (req, res) => {
 
 mainRouter.get('/leaderboard/:gamemode', async (req, res) => {
     let gamemode = req.params.gamemode;
-    if (gamemode != '40lines' && gamemode != 'vs' && gamemode != 'zen') {
+    if (gamemode != '40lines' && gamemode != 'zen') {
         res.redirect('/');
         return;
     }
@@ -194,6 +225,7 @@ mainRouter.get('/leaderboard/:gamemode', async (req, res) => {
 
     res.render('leaderboard', {
         currentPage: "/leaderboard",
+        leaderboard: gamemode,
         user: req.session.user,
         scores
     }, (error, html) => {

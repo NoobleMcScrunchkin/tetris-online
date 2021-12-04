@@ -32,6 +32,15 @@ section {
     align-items: center;
 }
 
+.gameSection {
+    text-align: center;
+    display: flex;
+    flex-flow: row;
+    height: 100%;
+    justify-content: center;
+    padding: 0;
+}
+
 .remaining-height {
     flex-grow: 1;
 }
@@ -106,6 +115,7 @@ section {
     height: 85%;
     position: relative;
     float: left;
+    border-right: 1px solid white;
 }
 
 .sideinfo {
@@ -232,3 +242,18 @@ section {
 .img-text-height {
     height: 2em;
 }
+
+.leaderboardLinks {
+    border-bottom: 2px solid grey;
+    width: 25%;
+}
+
+.leaderboardLinks a {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.leaderboardLinks .active {
+    color: white;
+}
+

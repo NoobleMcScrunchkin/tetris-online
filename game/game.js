@@ -294,6 +294,16 @@ function newPiece(player) {
         if (players[player].grid[piece.x][piece.y] != undefined) {
             players[player].movingPieces = [];
             players[player].dead = true;
+            if (gameMode == 'zen') {
+                let time = (new Date()) - startTime;
+                // console.log(time);
+                parentPort.postMessage({
+                    type: 'zencomplete',
+                    time,
+                    user: players[player].user,
+                });
+                clearInterval(gameLoop);
+            }
         }
     });
 }

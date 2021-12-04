@@ -4,31 +4,35 @@ block head
     script(src="/js/clientgame.js") 
 
 block main
-    section
-        .gameArea 
-            .board
-                each i in Array.from(Array(20).keys())
-                    .row 
-                        each i in Array.from(Array(10).keys())
-                            .cell
-            .sideinfo
-                .sendLines 
-                .otherInfo
-                    .held.infoSection
-                        h1 Held
-                        #heldPiece
-                            each i in Array.from(Array(4).keys())
-                                .row 
+    div.p-4
+        section.gameSection
+            if (!mobile)
+                .gameArea 
+                    .board
+                        each i in Array.from(Array(20).keys())
+                            .row 
+                                each i in Array.from(Array(10).keys())
+                                    .cell
+                    .sideinfo
+                        .sendLines 
+                        .otherInfo
+                            .held.infoSection
+                                h1 Held
+                                #heldPiece
                                     each i in Array.from(Array(4).keys())
-                                        .cell
-                    .nextPiece.infoSection
-                        h1 Next Piece
-                        #nextPiece
-                            each i in Array.from(Array(4).keys())
-                                .row 
+                                        .row 
+                                            each i in Array.from(Array(4).keys())
+                                                .cell
+                            .nextPiece.infoSection
+                                h1 Next Piece
+                                #nextPiece
                                     each i in Array.from(Array(4).keys())
-                                        .cell
-        #otherPlayers(hidden)
-        br
-        button(onclick="newGameLobby('vs')") New Game Lobby 
-        button(onclick="startGame()") Start Game
+                                        .row 
+                                            each i in Array.from(Array(4).keys())
+                                                .cell
+                #otherPlayers(hidden)
+                br
+            else 
+                h1 Sorry, the game is not available on mobile yet.
+        h2#LobbyURL
+        button#startGame.btn.btn-primary(onclick="startGame()") Start Game
