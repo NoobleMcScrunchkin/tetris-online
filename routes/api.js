@@ -1,8 +1,26 @@
 const express = require('express');
 const debug = require('debug')('routes/api');
 const chalk = require('chalk');
-const { MongoClient, ObjectID } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const path = require('path');
+const multer = require('multer')
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'static/img/users')
+    },
+    filename: function (req, file, cb) {
+        if (req.session.user && req.session.user._id) {
+            cb(null, file.fieldname + '-' + req.session.user._id);
+        } else {
+            cb('Not Logged in', false);
+        }
+    }
+})
+
+
+let upload = multer({ storage: storage });
+
 var gameHandler;
 var io;
 
@@ -10,13 +28,13 @@ const dburl = 'mongodb://localhost:27017';
 const dbname = 'tetris';
 
 function makeid(length) {
-    var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-   return result;
+    return result;
 }
 
 const apiRouter = express.Router();
@@ -29,7 +47,7 @@ apiRouter.post('/newGame', async (req, res) => {
     let gameMode = req.body.gamemode;
 
     if (gameMode != "vs" && gameMode != "40lines" && gameMode != "zen") {
-        res.json({error: "Invalid Gamemode"});
+        res.json({ error: "Invalid Gamemode" });
         return;
     }
 
@@ -39,14 +57,14 @@ apiRouter.post('/newGame', async (req, res) => {
         try {
             client = await MongoClient.connect(dburl);
             debug('Connected to the mongodb server');
-            
+
             const db = client.db(dbname);
 
-            let player = await db.collection('players').findOne({sessionID: req.session.id});
-            if (!await db.collection('games').findOne({creator: req.session.id})) {
+            let player = await db.collection('players').findOne({ sessionID: req.session.id });
+            if (!await db.collection('games').findOne({ creator: req.session.id })) {
                 response = 1;
                 while (response != null) {
-                    response = await db.collection('games').findOne({gameID}, { projection: {_id: 1}})
+                    response = await db.collection('games').findOne({ gameID }, { projection: { _id: 1 } })
                     if (response != null) {
                         gameID = makeid(6);
                     }
@@ -55,16 +73,16 @@ apiRouter.post('/newGame', async (req, res) => {
                 if (req.session.user) {
                     userid = await req.session.user._id;
                 }
-                response = await db.collection('games').insertOne({gameID, creator: req.session.id, playing: false, gameMode, players: [{session: req.session.id, socket: player.socket, user: userid}]});
-                await db.collection('players').updateOne({sessionID: req.session.id}, {$set: {gameID}});
+                response = await db.collection('games').insertOne({ gameID, creator: req.session.id, playing: false, gameMode, players: [{ session: req.session.id, socket: player.socket, user: userid }] });
+                await db.collection('players').updateOne({ sessionID: req.session.id }, { $set: { gameID } });
                 req.session.gameID = gameID;
                 req.session.save();
-                res.json({gameID});
+                res.json({ gameID });
             } else {
                 client.close();
-                res.json({error: 'You already have an active game'});
+                res.json({ error: 'You already have an active game' });
             }
-        } catch(err) {debug(err);}
+        } catch (err) { debug(err); }
         client.close();
     })();
 });
@@ -74,20 +92,20 @@ apiRouter.post('/startGame', async (req, res) => {
 
     client = await MongoClient.connect(dburl);
     debug('Connected to the mongodb server');
-    
+
     const db = client.db(dbname);
 
-    let game = await db.collection('games').findOne({gameID});
-    if (game && !game.playing) {   
+    let game = await db.collection('games').findOne({ gameID });
+    if (game && !game.playing) {
         const players = game.players;
 
         gameHandler.startGame(players, gameID, game.gameMode);
 
-        db.collection('games').updateOne({gameID}, { $set: { playing: true } })
+        db.collection('games').updateOne({ gameID }, { $set: { playing: true } })
 
-        res.json({success: true});
+        res.json({ success: true });
     } else {
-        res.json({error: "Game does not exist."});
+        res.json({ error: "Game does not exist." });
     }
 })
 
@@ -96,34 +114,44 @@ apiRouter.post('/joinGame', async (req, res) => {
 
     client = await MongoClient.connect(dburl);
     debug('Connected to the mongodb server');
-    
+
     const db = client.db(dbname);
 
-    let player = await db.collection('players').findOne({sessionID: req.session.id});
+    let player = await db.collection('players').findOne({ sessionID: req.session.id });
 
-    let game = await db.collection('games').findOne({gameID});
+    let game = await db.collection('games').findOne({ gameID });
     if (game && !game.playing && game.gameMode == 'vs') {
         if (game.players.map(e => e.socket).indexOf(player.socket) != -1 || game.players.map(e => e.session).indexOf(req.session.id) != -1) {
-            res.json({error: "Already in this game."})
+            res.json({ error: "Already in this game." })
         } else {
             let userid;
             if (req.session.user) {
                 userid = await req.session.user._id;
             }
-            let response = await db.collection('games').updateOne({gameID}, { $push: { players: { session: req.session.id, socket: player.socket, user: userid } } })
-            await db.collection('players').updateOne({sessionID: req.session.id}, {$set: {gameID}});
+            let response = await db.collection('games').updateOne({ gameID }, { $push: { players: { session: req.session.id, socket: player.socket, user: userid } } })
+            await db.collection('players').updateOne({ sessionID: req.session.id }, { $set: { gameID } });
             req.session.gameID = gameID;
             req.session.save();
             let ids = [];
             game.players.forEach(playerDB => {
-                io.to(playerDB.socket, playerDB.session).emit('newPlayer', {id: player.socket});
+                io.to(playerDB.socket, playerDB.session).emit('newPlayer', { id: player.socket });
                 ids.push(playerDB.socket);
             })
-            res.json({success: true, otherPlayers: ids});
+            res.json({ success: true, otherPlayers: ids });
         }
     } else {
-        res.json({error: "Game does not exist or is playing."});
+        res.json({ error: "Game does not exist or is playing." });
     }
+});
+
+apiRouter.post('/profilePicUpload', upload.single('avatar'), async (req, res) => {
+    client = await MongoClient.connect(dburl);
+    debug('Connected to the mongodb server');
+
+    const db = client.db(dbname);
+
+    await db.collection('users').updateOne({ _id: ObjectId(req.session.user._id) }, { $set: { avatar: true } });
+    res.redirect('/profile');
 });
 
 function start(newio) {
@@ -131,6 +159,6 @@ function start(newio) {
     gameHandler = require('../game/gameServerHandler');
     gameHandler.init(io);
     return apiRouter;
-} 
+}
 
 module.exports = start;

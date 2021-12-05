@@ -191,6 +191,7 @@ mainRouter.get('/zen', (req, res) => {
 });
 
 mainRouter.get('/leaderboard', async (req, res) => {
+    console.log(1);
     res.redirect('/leaderboard/40lines');
 });
 
@@ -215,18 +216,16 @@ mainRouter.get('/leaderboard/:gamemode', async (req, res) => {
     for (let i = 0; i < scoresDB.length; i++) {
         let score = scoresDB[i];
         let user = await db.collection('users').findOne({_id: new ObjectId(score.user)});
-        let username = '';
-        if (user) {
-            username = await user.username;
-        }
         scores.push({
-            username,
-            time: score.time
+            username: user ? user.username : '',
+            id: user ? user._id : '',
+            time: score.time,
+            avatar: user.avatar ? score.user : false
         });
     }
 
     res.render('leaderboard', {
-        currentPage: "/leaderboard",
+        currentPage: "/leaderboard/40lines",
         leaderboard: gamemode,
         user: req.session.user,
         scores
@@ -239,5 +238,122 @@ mainRouter.get('/leaderboard/:gamemode', async (req, res) => {
         res.send(html);
     });
 });
+
+mainRouter.get('/profile', async (req, res) => {
+    if (!req.session.user || !req.session.user._id) {
+        res.redirect('/');
+        return;
+    }
+
+    client = await MongoClient.connect(dburl);
+    debug('Connected to the mongodb server');
+    
+    const db = client.db(dbname);
+
+    userInfo = await db.collection('users').findOne({_id: ObjectId(req.session.user._id)});
+
+    if (!userInfo) {
+        res.redirect('/');
+        return;
+    }
+
+    let linesScoresDB = await db.collection('40lines').find({user: req.session.user._id}).sort({time: 1}).toArray();
+
+    var linesScores = [];
+
+    for (let i = 0; i < linesScoresDB.length; i++) {
+        let score = linesScoresDB[i];
+        linesScores.push({
+            time: score.time,
+        });
+    }
+
+    let zenScoresDB = await db.collection('zen').find({user: req.session.user._id}).sort({time : -1}).toArray();
+
+    var zenScores = [];
+
+    for (let i = 0; i < zenScoresDB.length; i++) {
+        let score = zenScoresDB[i];
+        zenScores.push({
+            time: score.time
+        });
+    }
+
+    res.render('profile', {
+        currentPage: "/profile",
+        user: req.session.user,
+        profileData: {
+            userInfo,
+            scores: {
+                zen: zenScores,
+                fourtylines: linesScores
+            }
+        }
+    }, (error, html) => {
+        if (error) {
+            console.warn(error);
+            res.end();
+            return;
+        }
+        res.send(html);
+    });
+})
+
+mainRouter.get('/profile/:id', async (req, res) => {
+    let id = req.params.id;
+
+    client = await MongoClient.connect(dburl);
+    debug('Connected to the mongodb server');
+    
+    const db = client.db(dbname);
+
+    userInfo = await db.collection('users').findOne({_id: ObjectId(id)});
+
+    if (!userInfo) {
+        res.redirect('/');
+        return;
+    }
+
+    let linesScoresDB = await db.collection('40lines').find({user: id}).sort({time: 1}).toArray();
+
+    var linesScores = [];
+
+    for (let i = 0; i < linesScoresDB.length; i++) {
+        let score = linesScoresDB[i];
+        linesScores.push({
+            time: score.time,
+        });
+    }
+
+    let zenScoresDB = await db.collection('zen').find({user: id}).sort({time : -1}).toArray();
+
+    var zenScores = [];
+
+    for (let i = 0; i < zenScoresDB.length; i++) {
+        let score = zenScoresDB[i];
+        zenScores.push({
+            time: score.time
+        });
+    }
+
+    res.render('profile', {
+        currentPage: "/profile/" + id,
+        user: req.session.user,
+        profileData: {
+            userInfo,
+            scores: {
+                zen: zenScores,
+                fourtylines: linesScores
+            }
+        }
+    }, (error, html) => {
+        if (error) {
+            console.warn(error);
+            res.end();
+            return;
+        }
+        res.send(html);
+    });
+})
 
 module.exports = mainRouter;

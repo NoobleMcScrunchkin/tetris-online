@@ -222,7 +222,7 @@ section {
 }
 
 .formFailure {
-    background: rgba(255, 0 , 0, 0.25);
+    background: rgba(255, 0, 0, 0.25);
     padding: 0.25em;
     border: 1px solid white;
     border-radius: 8px;
@@ -243,6 +243,15 @@ section {
     height: 2em;
 }
 
+a {
+    text-decoration: none;
+    color: currentColor;
+}
+
+a:hover {
+    color: #ccc;
+}
+
 .leaderboardLinks {
     border-bottom: 2px solid grey;
     padding-left: 16px;
@@ -250,7 +259,6 @@ section {
 }
 
 .leaderboardLinks a {
-    text-decoration: none;
     color: rgba(255, 255, 255, 0.55);
 }
 
@@ -265,6 +273,47 @@ section {
     font-size: 1.5em;
     --bs-table-bg: #2a2a2a;
     --bs-table-striped-bg: #333;
+    border-radius: 8px;
+    border: 1px solid #444;
+}
+
+.avatar {
+    object-fit: cover;
+    width: 64px;
+    height: 64px;
+}
+
+.profileAvatar {
+    -webkit-filter: brightness(100%);
+    filter: brightness(100%);
+    transition: all 0.3s ease-in-out;
+}
+
+.avatarParent:hover .profileAvatar {
+    -webkit-filter: brightness(50%);
+    filter: brightness(50%);
+}
+
+.avatarParent:hover .changeAvatar {
+    color:rgba(255, 255, 255, 1);
+}
+
+.changeAvatar {
+    color:rgba(255, 255, 255, 0);
+    position: absolute;
+    transform: translate(-100%);
+    min-height: 64px;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    width: 64px;
+    height: 64px;
+    vertical-align: middle;
+    transition: all 0.3s ease-in-out;
+}
+
+.profileHeader {
+    background: var(--bg-game);
     border-radius: 8px;
     border: 1px solid #444;
 }

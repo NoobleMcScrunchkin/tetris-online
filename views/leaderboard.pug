@@ -18,15 +18,19 @@ block main
                 a.ms-4(href="/leaderboard/zen") 
                     h2.d-inline Zen
     section
-        table.table.table-borderless.text-white.table-striped.table-dark
-            thead 
-                th(width="64px")
-                th Username 
-                th Time 
+        table.table.text-white.table-striped.table-dark
+            thead.text-center
+                th(colspan=2) User 
+                th.border-start Time
             tbody             
                 each score in scores
                     tr
+                        td(width="64px")
+                            a(href="/profile/" + score.id) 
+                                if (score.avatar)
+                                    img.rounded.avatar(src="/img/users/avatar-"+score.avatar alt=score.username width="64px" height="64px" onerror='this.src = "/img/users/default.webp"')
+                                else 
+                                    img.rounded.avatar(src="/img/users/default.webp" alt=score.username width="64px" height="64px")
                         td
-                            img(src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt=score.username width="64px" height="64px")
-                        td= score.username 
-                        td= score.time / 1000
+                            a(href="/profile/" + score.id)= score.username 
+                        td.border-start= score.time / 1000 + 's'

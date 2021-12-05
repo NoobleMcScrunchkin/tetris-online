@@ -217,6 +217,7 @@ function startGame() {
         return response.json();
     })().then((data) => {
         console.log(data);
+        document.getElementById('startGame').disabled = true;
     });
 }
 

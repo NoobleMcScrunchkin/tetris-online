@@ -9,8 +9,11 @@ html(lang="en")
         meta(name='google-signin-client_id' content='638312205904-tjff8pm437b6uhtcn3o29mi4e4jm69nd.apps.googleusercontent.com')
         link(rel="stylesheet", href="/css/bootstrap.css")
         link(rel="stylesheet", href="/css/master.css")
-        script(src="https://apis.google.com/js/platform.js" async defer)
+        link(rel="manifest", href="/other/manifest.json")
         script(src="/js/bootstrap.min.js") 
+        script(src="/app.js" defer) 
+        link(rel="shortcut icon", href="/img/icons/favicon.ico", type="image/x-icon")
+        meta(name="theme-color" content="#cccccc")
         title Tetris
     body 
         include nav.pug 

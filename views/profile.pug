@@ -1,0 +1,38 @@
+extends components/template.pug
+
+block head 
+
+block main 
+    section.mt-4
+        .profileHeader.text-center.d-inline.p-4
+            if (user && user._id == profileData.userInfo._id)
+                form(action="/api/profilePicUpload" method="POST" enctype="multipart/form-data")
+                    input#avatarInput.d-none(type="file" name="avatar" accept="image/*" onchange="this.form.submit()") 
+                div.d-inline.position-relative.avatarParent(onclick=(user._id == profileData.userInfo._id? "avatarInput.click()" : ""))
+                    if (profileData.userInfo.avatar)
+                        img.rounded.avatar.profileAvatar(src="/img/users/avatar-"+profileData.userInfo._id alt=profileData.userInfo.username width="64px" height="64px")
+                    else 
+                        img.rounded.avatar.profileAvatar(src="/img/users/default.webp" alt=profileData.userInfo.username width="64px" height="64px")
+                    strong.changeAvatar Change Avatar
+            else
+                if (profileData.userInfo.avatar)
+                    img.rounded.avatar.profileAvatar(src="/img/users/avatar-"+profileData.userInfo._id alt=profileData.userInfo.username width="64px" height="64px")
+                else 
+                    img.rounded.avatar.profileAvatar(src="/img/users/default.webp" alt=profileData.userInfo.username width="64px" height="64px")
+            h2.align-middle.d-inline.ms-4= profileData.userInfo.username
+        table.table.text-white.table-striped.table-dark.w-75.scores.mt-2
+            thead.text-center
+                th Gamemode 
+                th.border-start Time
+            tbody             
+                each score in profileData.scores.fourtylines
+                    tr
+                        td 40 Lines
+                        td.border-start= score.time / 1000 + 's'    
+                each score in profileData.scores.zen
+                    tr
+                        td Zen
+                        td.border-start= score.time / 1000 + 's'
+                if (profileData.scores.zen.length == 0 && profileData.scores.fourtylines == 0)
+                    tr
+                        td(colspan=2) No Scores 
