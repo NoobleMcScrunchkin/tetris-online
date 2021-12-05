@@ -21,7 +21,6 @@ const credentials = {
     cert: fs.readFileSync('sslcert/server.crt', 'utf8')
 };
 
-// var httpServer = http.createServer(app);
 var httpsServer = https.createServer(credentials, app);
 const io = socketio(httpsServer);
 
